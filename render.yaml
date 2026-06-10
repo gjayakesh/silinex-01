@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: silinex-cms
+    env: php
+    region: oregon
+    buildCommand: |
+      cd silinex-cms && composer install --no-dev --prefer-dist
+      php setup_db.php
+    startCommand: |
+      php -S 0.0.0.0:${PORT} -t silinex-cms router.php
+    healthCheckPath: /login.php
+    envVars:
+      - key: DB_DRIVER
+        value: sqlite
