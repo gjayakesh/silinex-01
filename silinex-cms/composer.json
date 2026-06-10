@@ -1,0 +1,17 @@
+{
+  "name": "silinex/cms",
+  "description": "Silinex Global Services — Custom PHP CMS",
+  "type": "project",
+  "require": {
+    "php": ">=8.1",
+    "phpmailer/phpmailer": "^6.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "Silinex\\": "src/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true
+  }
+}
