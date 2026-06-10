@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /includes/
+Disallow: /assets/css/
+Disallow: /assets/js/
+Disallow: /search?q=
+
+# Sitemaps
+Sitemap: https://www.silinexglobal.com/sitemap.xml
+
+# Crawl delay (optional – remove if not needed)
+Crawl-delay: 5

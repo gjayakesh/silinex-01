@@ -1,0 +1,93 @@
+# ============================================================
+#  Silinex Global – Apache Configuration
+#  Clean URLs · Gzip · Cache · Security Headers
+# ============================================================
+
+Options -Indexes
+Options +FollowSymLinks
+
+# ── PHP Settings ─────────────────────────────────────────────
+php_flag display_errors Off
+php_value upload_max_filesize 10M
+php_value post_max_size 12M
+
+# ── Rewrite Engine ────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Skip real files and directories
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # Route API calls
+  RewriteRule ^api/(.+)$  api/$1.php [L,QSA]
+
+  # Sitemap
+  RewriteRule ^sitemap\.xml$  sitemap.php [L,QSA]
+
+  # Route everything else through front controller
+  RewriteRule ^(.*)$      index.php [L,QSA]
+</IfModule>
+
+# ── GZIP Compression ──────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml application/xml
+</IfModule>
+
+# ── Browser Caching ───────────────────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css                   "access plus 1 month"
+  ExpiresByType application/javascript     "access plus 1 month"
+  ExpiresByType image/png                  "access plus 3 months"
+  ExpiresByType image/jpg                  "access plus 3 months"
+  ExpiresByType image/jpeg                 "access plus 3 months"
+  ExpiresByType image/gif                  "access plus 3 months"
+  ExpiresByType image/webp                 "access plus 3 months"
+  ExpiresByType image/svg+xml              "access plus 3 months"
+  ExpiresByType font/woff2                 "access plus 6 months"
+  ExpiresByType application/font-woff2     "access plus 6 months"
+  ExpiresByType text/html                  "access plus 0 seconds"
+</IfModule>
+
+# ── Security Headers ──────────────────────────────────────────
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options  "nosniff"
+  Header always set X-Frame-Options         "SAMEORIGIN"
+  Header always set X-XSS-Protection        "1; mode=block"
+  Header always set Referrer-Policy         "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy      "geolocation=(), microphone=(), camera=()"
+  # Remove server signature
+  Header unset Server
+  Header unset X-Powered-By
+</IfModule>
+
+# ── Protect sensitive files ───────────────────────────────────
+<FilesMatch "^(config|\.env|composer\.json|composer\.lock|package\.json)">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# ── Prevent direct access to includes ────────────────────────
+<IfModule mod_rewrite.c>
+  RewriteRule ^includes/   - [F,L]
+</IfModule>
+
+# ── Force HTTPS (uncomment in production) ────────────────────
+# <IfModule mod_rewrite.c>
+#   RewriteCond %{HTTPS} off
+#   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+
+# ── www redirect (uncomment to enforce www) ──────────────────
+# <IfModule mod_rewrite.c>
+#   RewriteCond %{HTTP_HOST} !^www\.
+#   RewriteRule ^ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+
+# ── Custom error pages ────────────────────────────────────────
+ErrorDocument 404 /index.php
+ErrorDocument 500 /index.php
