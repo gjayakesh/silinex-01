@@ -101,7 +101,29 @@ function cms_init_schema(PDO $pdo): void
             snapshot_json  LONGTEXT NOT NULL,
             status         ENUM('draft','published','archived') NOT NULL DEFAULT 'draft',
             created_by     INT UNSIGNED DEFAULT NULL,
+            description    TEXT DEFAULT NULL,
+            version_type   VARCHAR(20) NOT NULL DEFAULT 'minor',
             created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        // ── Version Content ────────────────────────────────────────────────
+        $pdo->exec("CREATE TABLE IF NOT EXISTS version_content (
+            id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            version_id    INT UNSIGNED NOT NULL,
+            page_content  LONGTEXT DEFAULT NULL,
+            page_metadata LONGTEXT DEFAULT NULL,
+            FOREIGN KEY (version_id) REFERENCES versions(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        // ── Version Audit Log ──────────────────────────────────────────────
+        $pdo->exec("CREATE TABLE IF NOT EXISTS version_audit_log (
+            id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            version_id INT UNSIGNED NOT NULL,
+            user_id    INT UNSIGNED DEFAULT NULL,
+            action     VARCHAR(50) NOT NULL,
+            details    TEXT DEFAULT NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (version_id) REFERENCES versions(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
         // ── Images ────────────────────────────────────────────────────────
@@ -171,7 +193,27 @@ function cms_init_schema(PDO $pdo): void
             snapshot_json  TEXT         NOT NULL,
             status         VARCHAR(20)  NOT NULL DEFAULT 'draft',
             created_by     INTEGER      DEFAULT NULL,
+            description    TEXT         DEFAULT NULL,
+            version_type   VARCHAR(20)  NOT NULL DEFAULT 'minor',
             created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )");
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS version_content (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            version_id    INTEGER NOT NULL,
+            page_content  TEXT    DEFAULT NULL,
+            page_metadata TEXT    DEFAULT NULL,
+            FOREIGN KEY (version_id) REFERENCES versions(id) ON DELETE CASCADE
+        )");
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS version_audit_log (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            version_id INTEGER NOT NULL,
+            user_id    INTEGER DEFAULT NULL,
+            action     VARCHAR(50) NOT NULL,
+            details    TEXT    DEFAULT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (version_id) REFERENCES versions(id) ON DELETE CASCADE
         )");
 
         $pdo->exec("CREATE TABLE IF NOT EXISTS images (
@@ -184,6 +226,14 @@ function cms_init_schema(PDO $pdo): void
             created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
         )");
     }
+
+    // Alter table migration checks to ensure existing database runs are up-to-date
+    try {
+        $pdo->exec("ALTER TABLE versions ADD COLUMN description TEXT DEFAULT NULL");
+    } catch (PDOException $e) {}
+    try {
+        $pdo->exec("ALTER TABLE versions ADD COLUMN version_type VARCHAR(20) NOT NULL DEFAULT 'minor'");
+    } catch (PDOException $e) {}
 
     // Seed default admin user if table is empty
     $count = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();

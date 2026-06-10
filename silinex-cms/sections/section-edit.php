@@ -12,7 +12,7 @@ $sec = $sec->fetch();
 if (!$sec) { http_response_code(404); die('Section not found.'); }
 
 $sectionTypes = ['hero','services','stats','about','testimonial','faq','cta-banner','custom-html'];
-$bgThemes     = ['white','light','dark','blue'];
+$bgThemes     = ['white','light-blue','dark-navy'];
 $statusOpts   = ['draft','published'];
 $error = ''; $saved = '';
 

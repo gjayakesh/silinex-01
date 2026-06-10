@@ -12,7 +12,7 @@ $page = $page->fetch();
 if (!$page) { http_response_code(404); die('Page not found.'); }
 
 $sectionTypes = ['hero','services','stats','about','testimonial','faq','cta-banner','custom-html'];
-$bgThemes     = ['white','light','dark','blue'];
+$bgThemes     = ['white','light-blue','dark-navy'];
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
