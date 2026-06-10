@@ -26,8 +26,19 @@ a:hover { text-decoration: underline; }
 
 /* ── Layout ─────────────────────────────────────────────── */
 .cms-layout  { display: flex; min-height: 100vh; }
-.cms-sidebar { width: 220px; background: var(--color-white); border-right: 1px solid var(--color-border);
-               display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+ .cms-sidebar {
+    width: 220px;
+    background: var(--color-dark-navy);
+    color: var(--color-white);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+ }
 .cms-logo    { padding: 20px 20px 16px; border-bottom: 1px solid var(--color-border); }
 .cms-nav     { padding: 12px 8px; flex: 1; }
 .cms-nav-item{ display: block; padding: 9px 14px; border-radius: var(--radius); color: var(--color-body-text);
