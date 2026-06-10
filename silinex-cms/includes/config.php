@@ -12,7 +12,7 @@ define('CMS_URL',  'http://127.0.0.1:8080/cms'); // CMS
 // Default: SQLite (zero config, works out of the box).
 // For MySQL: change DB_DRIVER to 'mysql' and fill in the values below.
 define('DB_DRIVER',  'sqlite');
-define('DB_PATH',    __DIR__ . '/../data/silinex_cms.sqlite');
+define('DB_PATH',    '/tmp/silinex_cms.sqlite');
 
 define('DB_HOST',    '127.0.0.1');
 define('DB_PORT',    '3306');
