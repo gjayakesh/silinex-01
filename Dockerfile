@@ -12,7 +12,7 @@ COPY . .
 
 RUN cd silinex-cms && composer install --no-dev --no-interaction
 
-RUN php silinex-cms/setup_db.php
+RUN cd silinex-cms && php setup_db.php
 
 EXPOSE 8080
 
