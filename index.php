@@ -1,4 +1,3 @@
 <?php
-header('Location: /cms/');
-exit;
+require __DIR__ . '/router.php';
 ?>
