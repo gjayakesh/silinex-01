@@ -15,18 +15,20 @@ RUN docker-php-ext-install pdo pdo_sqlite
 # Set working directory to Apache's document root
 WORKDIR /var/www/html
 
-# Copy the CMS source into the container
-COPY silinex-cms/ .
+# Copy the static website files
+COPY silinex/ .
+# Copy the CMS source into the container under /cms
+COPY silinex-cms/ cms/
 
 # Install Composer (official installer)
 RUN curl -sS https://getcomposer.org/installer | php -- \
         --install-dir=/usr/local/bin --filename=composer
 
-# Install project dependencies (no dev dependencies)
-RUN composer install --no-dev --prefer-dist
+# Install project dependencies (no dev dependencies) for CMS
+RUN cd cms && composer install --no-dev --prefer-dist
 
-# Run DB setup during image build (creates SQLite DB)
-RUN php setup_db.php
+# Run DB setup during image build (creates SQLite DB) for CMS
+RUN php cms/setup_db.php
 
 # Expose the HTTP port (Apache listens on 80)
 EXPOSE 80
