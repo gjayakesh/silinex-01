@@ -8,6 +8,17 @@ require_once __DIR__ . '/../includes/csrf.php';
 require_once __DIR__ . '/../includes/versions.php';
 
 $versions = list_versions($pdo);
+if (empty($versions)) {
+    $versions = [[
+        'id' => 0,
+        'version_number' => '1.0',
+        'status' => 'Published',
+        'description' => 'Current live site',
+        'version_type' => 'default',
+        'created_at' => date('Y-m-d H:i:s'),
+        'creator_name' => 'System'
+    ]];
+}
 $pageTitle = 'Versions';
 $activeNav = 'versions';
 include __DIR__ . '/../includes/layout-header.php';
@@ -28,10 +39,13 @@ include __DIR__ . '/../includes/layout-header.php';
 
 <div class="version-grid">
   <?php foreach ($versions as $version): ?>
-  <article class="version-card">
-    <div class="version-card-head">
-      <h3>Version <?= htmlspecialchars(format_version_number($version['version_number'])) ?></h3>
-      <span class="status-badge status-<?= strtolower($version['status']) ?>"><?= htmlspecialchars($version['status']) ?></span>
+  <article class="version-card" <?php if ($version['id'] == 0) echo 'data-default="true"'; ?>>
+  <div class="version-card-head">
+    <h3>Version <?= htmlspecialchars(format_version_number($version['version_number'])) ?></h3>
+    <span class="status-badge status-<?= strtolower($version['status']) ?>"><?= htmlspecialchars($version['status']) ?></span>
+<?php if ($version['id'] == 0): ?>
+    <span class="live-badge">Live</span>
+<?php endif; ?>
     </div>
     <p class="version-description"><?= nl2br(htmlspecialchars($version['description'])) ?></p>
     <div class="version-meta">

@@ -1,5 +1,4 @@
-# Dockerfile for Silinex-CMS (PHP 8.2 + Apache)
-# ---------------------------------------------------
+
 FROM php:8.2-apache
 
 # Install system packages needed for SQLite and Composer
@@ -7,7 +6,7 @@ RUN apt-get update && apt-get install -y \
         libsqlite3-dev \
         unzip \
         git \
-    && rm -rf /var/lib/apt/lists/*
+        && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_sqlite

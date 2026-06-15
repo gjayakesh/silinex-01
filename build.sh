@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# build.sh – helper script to build the Docker image from the repository root.
-# This ensures Docker can locate the Dockerfile regardless of the current working directory.
 
 # Determine the directory of this script (repo root)
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"

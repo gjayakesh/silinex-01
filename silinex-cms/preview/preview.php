@@ -5,14 +5,21 @@ require_once __DIR__ . '/../includes/versions.php';
 
 $slug  = preg_replace('/[^a-z0-9\-]/', '', strtolower($_GET['page'] ?? 'home'));
 $version = preg_replace('/[^0-9\.]/', '', $_GET['version'] ?? '');
-$signaturePayload = $slug . $_SESSION['user_id'] . $version;
-$token = base64_encode(json_encode([
-    'user_id'   => $_SESSION['user_id'],
-    'page'      => $slug,
-    'version'   => $version,
-    'expires'   => time() + 3600,
-    'signature' => hash_hmac('sha256', $signaturePayload, CMS_SECRET_KEY)
-]));
+// Verify preview token
+$tokenData = json_decode(base64_decode($_GET['token'] ?? ''), true);
+$valid = false;
+if ($tokenData && isset($tokenData['user_id'], $tokenData['page'], $tokenData['version'], $tokenData['expires'], $tokenData['signature'])) {
+    $expected = hash_hmac('sha256', $tokenData['page'] . $tokenData['user_id'] . $tokenData['version'], CMS_SECRET_KEY);
+    if (hash_equals($expected, $tokenData['signature']) && $tokenData['expires'] >= time() &&
+        $tokenData['user_id'] == ($_SESSION['cms_user_id'] ?? null) && $tokenData['page'] == $slug) {
+        $valid = true;
+    }
+}
+if (!$valid) {
+    http_response_code(403);
+    echo '<h2>Invalid or expired preview token.</h2>';
+    exit;
+}
 
 $sitePath = $slug === 'home' ? '/' : '/' . $slug;
 $previewUrl = $version
@@ -34,7 +41,7 @@ if ($pg) $pageId = $pg['id'];
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preview - <?= htmlspecialchars($version ?: $slug) ?> - Silinex CMS</title>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/cms/assets/css/cms-main.css">
+  <link rel="stylesheet" href="/cms/assets/css/cms.css">
   <style>
     body { margin:0; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
     #pf { flex:0 0 auto; width:100%; max-width:100%; border:none; background:#fff; transition:width 0.3s, flex-basis 0.3s; }
@@ -48,14 +55,14 @@ if ($pg) $pageId = $pg['id'];
     <span class="label">PREVIEWING WEBSITE: <?= $version ? 'VERSION ' . htmlspecialchars(format_version_number($version)) : strtoupper(htmlspecialchars($slug)) ?></span>
 
     <div style="display:flex;gap:10px;align-items:center;">
-      <button id="preview-mobile" class="btn-secondary btn-sm" type="button" aria-pressed="false">Mobile</button>
+      <a href="/cms/edit-page.php?id=<?= $pageId ?>" class="btn-accent btn-sm edit-button">Edit Title</a>
       <button id="preview-tablet" class="btn-secondary btn-sm" type="button" aria-pressed="false">Tablet</button>
       <button id="preview-desktop" class="btn-secondary btn-sm active" type="button" aria-pressed="true">Desktop</button>
-      <?php if (!$version): ?><a href="/cms/pages/page-edit.php?id=<?= $pageId ?>" class="btn-secondary btn-sm">Edit</a><?php endif; ?>
+      <?php if (!$version): ?>
+      <a href="/cms/pages/page-edit.php?id=<?= $pageId ?>" class="btn-secondary btn-sm">Edit</a>
+      <?php endif; ?>
       <?php if (!$version && $pageId): ?>
-      <a href="/cms/deploy/deploy.php?page_id=<?= $pageId ?>"
-         class="btn-accent btn-sm"
-         onclick="return confirm('Publish all draft sections of this page?')">Publish</a>
+      <a href="/cms/deploy/deploy.php?page_id=<?= $pageId ?>" class="btn-accent btn-sm" onclick="return confirm('Publish all draft sections of this page?')">Publish</a>
       <?php endif; ?>
     </div>
   </div>

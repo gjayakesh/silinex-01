@@ -117,9 +117,8 @@
       s.dataset.nexoraWidget = 'true';
       (d.head || d.body || d.documentElement).appendChild(s);
     }
-  })(window, document, "https://nexora-admin-eeog.onrender.com/widget/embed.js", "va_widget_live_GP0ARnEb1NsVBpXsufzhAW1OQ0saJ6zoihtHq0Qx", "https://nexora-api-ngnu.onrender.com/api/v1");
+  })(window, document, "https://nexora-admin-eeog.onrender.com/widget/embed.js", "va_widget_live_IgbDo5dIwbDGo3UDTk4cqUTZuWhTVowzidEBvNSJ", "https://nexora-api-ngnu.onrender.com/api/v1");
 </script>
-
 
 </body>
 
